@@ -266,3 +266,56 @@
 
         function renderizarCenario() {
             const cenario = cenarios[rodadaAtual];
+            elScenario.innerHTML = `<strong>${cenario.texto}</strong>`;
+            
+            elChoices.innerHTML = ''; // Limpa as opções anteriores
+            
+            cenario.opcoes.forEach((opcao, index) => {
+                const btn = document.createElement('button');
+                btn.innerText = opcao.texto;
+                btn.className = opcao.cor;
+                
+                // Adiciona o evento de clique pelo JS
+                btn.addEventListener('click', () => fazerEscolha(rodadaAtual, index));
+                
+                elChoices.appendChild(btn);
+            });
+
+            elProgress.innerText = `DECISÃO ${rodadaAtual + 1} DE ${cenarios.length}`;
+        }
+
+        function finalizarJogo() {
+            elChoices.innerHTML = '';
+            elProgress.innerText = "FIM DE JOGO";
+
+            if (xp >= 70 && futuro >= 70) {
+                elBoard.className = 'game-wrapper win-screen';
+                elScenario.innerHTML = "🏆 <strong>SUCESSO ABSOLUTO!</strong> Você sacrificou um pouco do seu conforto imediato, mas construiu um conhecimento sólido e garantiu um futuro brilhante. Estar presente fez a diferença!";
+            } else if (xp >= 40 || futuro >= 40) {
+                elScenario.innerHTML = "⚠️ <strong>NA MÉDIA...</strong> Você cedeu à preguiça algumas vezes. O conforto cobrou seu preço: você perdeu conexões importantes e lacunas no seu conhecimento ficaram para trás.";
+            } else {
+                elBoard.className = 'game-wrapper lose-screen';
+                elScenario.innerHTML = "🚨 <strong>GAME OVER ACADÊMICO.</strong> Você escolheu o conforto sempre que pôde. Sua energia está alta, mas seu conhecimento e seu futuro afundaram. A escola só funciona se você estiver lá.";
+            }
+
+            const btnRestart = document.createElement('button');
+            btnRestart.innerText = "🔄 Tentar Novamente";
+            btnRestart.style.background = "#fff";
+            btnRestart.style.color = "#000";
+            btnRestart.addEventListener('click', () => location.reload());
+            elChoices.appendChild(btnRestart);
+        }
+
+        function iniciarJogo() {
+            rodadaAtual = 0;
+            xp = 20; futuro = 30; energia = 100;
+            elBoard.className = 'game-wrapper';
+            atualizarDisplay(0, 0, 0);
+            renderizarCenario();
+        }
+
+        // Ativa o botão de iniciar logo que a página carrega
+        btnIniciar.addEventListener('click', iniciarJogo);
+    </script>
+</body>
+</html>
