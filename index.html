@@ -111,6 +111,10 @@
         button:hover { filter: brightness(1.1); transform: translateY(-2px); }
         button:active { transform: translateY(0); }
         
+        /* Cores dos botões corrigidas */
+        .btn-good { background: var(--accent2); }
+        .btn-good:hover { background: #059669; }
+        
         .btn-bad { background: #475569; }
         .btn-bad:hover { background: var(--danger); }
 
@@ -121,7 +125,6 @@
             letter-spacing: 2px;
         }
 
-        /* Confetti effect class */
         .win-screen {
             background: linear-gradient(135deg, var(--accent2), #059669);
             color: white;
@@ -160,7 +163,7 @@
         </div>
 
         <div class="choices" id="choices-container">
-            <button onclick="iniciarJogo()">Começar o Jogo</button>
+            <button id="btn-iniciar">Começar o Jogo</button>
         </div>
 
         <div class="progress" id="progress-text"></div>
@@ -176,7 +179,7 @@
         // Cenários do Jogo
         const cenarios = [
             {
-                texto: "Semana 1: Choveu muito e está um frio terrível. A cama está quentinha e convidativa.",
+                texto: "Semana 1: Choveu muito e está um frio terrível. A cama está quentinha.",
                 opcoes: [
                     { texto: "Levantar e encarar a chuva! (Ir à escola)", xp: 15, futuro: 15, energia: -20, cor: "btn-good" },
                     { texto: "Ficar dormindo... zZZz (Faltar)", xp: -5, futuro: -10, energia: 20, cor: "btn-bad" }
@@ -186,7 +189,7 @@
                 texto: "Semana 2: Hoje tem apresentação daquele trabalho em grupo que vale metade da nota.",
                 opcoes: [
                     { texto: "Apresentar e salvar o grupo!", xp: 25, futuro: 20, energia: -25, cor: "btn-good" },
-                    { texto: "Fingir dor de barriga e deixar o grupo na mão.", xp: -20, futuro: -25, energia: 10, cor: "btn-bad" }
+                    { texto: "Fingir dor de barriga e faltar.", xp: -20, futuro: -25, energia: 10, cor: "btn-bad" }
                 ]
             },
             {
@@ -197,14 +200,14 @@
                 ]
             },
             {
-                texto: "Semana 4: Um professor de uma matéria que você tem dificuldade ofereceu aula de reforço hoje.",
+                texto: "Semana 4: Um professor ofereceu aula de reforço hoje.",
                 opcoes: [
                     { texto: "Participar para tentar entender a matéria.", xp: 30, futuro: 20, energia: -30, cor: "btn-good" },
                     { texto: "Ir embora mais cedo jogar videogame.", xp: -15, futuro: -10, energia: 20, cor: "btn-bad" }
                 ]
             },
             {
-                texto: "Semana 5: Última semana. Feira de profissões na escola com várias pessoas de fora.",
+                texto: "Semana 5: Feira de profissões na escola com pessoas do mercado de trabalho.",
                 opcoes: [
                     { texto: "Fazer contatos e pensar no futuro.", xp: 20, futuro: 35, energia: -20, cor: "btn-good" },
                     { texto: "Matar aula para ir no shopping com amigos.", xp: -10, futuro: -30, energia: 15, cor: "btn-bad" }
@@ -220,13 +223,13 @@
         const elChoices = document.getElementById('choices-container');
         const elProgress = document.getElementById('progress-text');
         const elBoard = document.getElementById('game-board');
+        const btnIniciar = document.getElementById('btn-iniciar');
 
         function atualizarDisplay(diffXp, diffFuturo, diffEnergia) {
-            // Animação visual de subir/descer
             const animar = (el, diff) => {
                 if(diff === 0) return;
                 el.classList.remove('up', 'down');
-                void el.offsetWidth; // trigger reflow
+                void el.offsetWidth; // Força o navegador a reiniciar a animação
                 el.classList.add(diff > 0 ? 'up' : 'down');
             };
 
@@ -246,7 +249,20 @@
             futuro += escolha.futuro;
             energia += escolha.energia;
 
-            // Limites lógicos
             if (xp > 100) xp = 100; if (xp < 0) xp = 0;
             if (futuro > 100) futuro = 100; if (futuro < 0) futuro = 0;
-            if (energia > 100) energia = 100
+            if (energia > 100) energia = 100; if (energia < 0) energia = 0;
+
+            atualizarDisplay(escolha.xp, escolha.futuro, escolha.energia);
+            
+            rodadaAtual++;
+            
+            if (rodadaAtual < cenarios.length) {
+                renderizarCenario();
+            } else {
+                finalizarJogo();
+            }
+        }
+
+        function renderizarCenario() {
+            const cenario = cenarios[rodadaAtual];
