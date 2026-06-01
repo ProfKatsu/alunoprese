@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jornada do 9º Ano A - O Valor da Presença</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --bg-color: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .status-board {
+            background: #f8f9fa;
+            border: 2px solid #bdc3c7;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            margin: 10px 0;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            background: #ecf0f1;
+            border-radius: 5px;
+            height: 20px;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        #conhecimento-fill { background: var(--secondary-color); width: 10%; }
+        #oportunidade-fill { background: var(--success-color); width: 50%; }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        button:active { transform: scale(0.98); }
+        button:hover { opacity: 0.9; }
+
+        .btn-escola { background-color: var(--secondary-color); }
+        .btn-faltar { background-color: var(--danger-color); }
+        .btn-reiniciar { background-color: var(--primary-color); display: none; }
+
+        .message-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #e1f5fe;
+            min-height: 50px;
+            font-weight: 500;
+        }
+
+        #dia-counter {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            background: #ecf0f1;
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Simulador: O Valor da Presença</h1>
+        <p class="subtitle">Escola Elisiário Pinto de Morais - 9º Ano A</p>
+
+        <div id="dia-counter">Dia: 1 / 20</div>
+
+        <div class="status-board">
+            <div class="stat">
+                Conhecimento Acumulado (<span id="conhecimento-val">10</span>%)
+                <div class="progress-bar"><div id="conhecimento-fill" class="progress-fill"></div></div>
+            </div>
+            <div class="stat">
+                Oportunidades Futuras (<span id="oportunidade-val">50</span>%)
+                <div class="progress-bar"><div id="oportunidade-fill" class="progress-fill"></div></div>
+            </div>
+        </div>
+
+        <div class="actions" id="action-buttons">
+            <button class="btn-escola" onclick="fazerEscolha('escola')">🎒 Ir para a Escola (+Conhecimento)</button>
+            <button class="btn-faltar" onclick="fazerEscolha('faltar')">🎮 Faltar na Aula (Perde Oportunidades)</button>
+        </div>
+
+        <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciarJogo()">🔄 Jogar Novamente</button>
+
+        <div class="message-box" id="mensagem">
+            Bem-vindo ao simulador! Suas escolhas hoje moldam o seu amanhã. O que você vai fazer hoje?
+        </div>
+    </div>
+
+    <script>
+        let diaAtual = 1;
+        const totalDias = 20;
+        let conhecimento = 10;
+        let oportunidades = 50;
+        let faltas = 0;
+
+        const conhecimentoFill = document.getElementById('conhecimento-fill');
+        const oportunidadeFill = document.getElementById('oportunidade-fill');
+        const conhecimentoVal = document.getElementById('conhecimento-val');
+        const oportunidadeVal = document.getElementById('oportunidade-val');
+        const mensagem = document.getElementById('mensagem');
+        const diaCounter = document.getElementById('dia-counter');
+        const actionButtons = document.getElementById('action-buttons');
+        const btnReiniciar = document.getElementById('btn-reiniciar');
+
+        function atualizarUI() {
+            conhecimentoVal.innerText = conhecimento;
+            oportunidadeVal.innerText = oportunidades;
+            conhecimentoFill.style.width = conhecimento + '%';
+            oportunidadeFill.style.width = oportunidades + '%';
+            diaCounter.innerText = `Dia: ${diaAtual} / ${totalDias}`;
+        }
+
+        function fazerEscolha(acao) {
+            if (acao === 'escola') {
+                conhecimento += 15;
+                oportunidades += 5;
+                mensagem.innerHTML = "<strong>Boa escolha!</strong> Você aprendeu coisas novas e ficou mais preparado.";
+                mensagem.style.background = "#e8f8f5";
+                mensagem.style.color = "#27ae60";
+            } else if (acao === 'faltar') {
+                faltas++;
+                oportunidades -= 12;
+                mensagem.innerHTML = "<strong>Você faltou...</strong> O assunto avançou e você perdeu conexões importantes.";
+                mensagem.style.background = "#fdedec";
+                mensagem.style.color = "#c0392b";
+            }
+
+            // Limites de 0 a 100
+            if (conhecimento > 100) conhecimento = 100;
+            if (oportunidades > 100) oportunidades = 100;
+            if (oportunidades < 0) oportunidades = 0;
+
+            diaAtual++;
+
+            if (diaAtual > totalDias) {
+                finalizarJogo();
+            } else {
+                atualizarUI();
+            }
+        }
+
+        function finalizarJogo() {
+            atualizarUI();
+            actionButtons.style.display = 'none';
+            btnReiniciar.style.display = 'block';
+            diaCounter.innerText = "Fim do Semestre!";
+
+            let taxaPresenca = ((totalDias - faltas) / totalDias) * 100;
+
+            if (conhecimento >= 80 && oportunidades >= 80) {
+                mensagem.innerHTML = `🌟 <strong>Parabéns!</strong> Sua presença foi de ${taxaPresenca}%. O esforço diário construiu uma base sólida. Você está pronto para os desafios do Ensino Médio!`;
+                mensagem.style.background = "#d4edda";
+                mensagem.style.color = "#155724";
+            } else if (conhecimento >= 50 && oportunidades >= 40) {
+                mensagem.innerHTML = `⚠️ <strong>Quase lá.</strong> Sua presença foi de ${taxaPresenca}%. Você sobreviveu ao semestre, mas as faltas deixaram algumas lacunas no aprendizado que precisarão ser recuperadas.`;
+                mensagem.style.background = "#fff3cd";
+                mensagem.style.color = "#856404";
+            } else {
+                mensagem.innerHTML = `🚨 <strong>Alerta de Retenção.</strong> Sua presença foi de apenas ${taxaPresenca}%. As faltas constantes destruíram suas oportunidades. Sem estar na escola, a mágica do aprendizado não acontece.`;
+                mensagem.style.background = "#f8d7da";
+                mensagem.style.color = "#721c24";
+            }
+        }
+
+        function reiniciarJogo() {
+            diaAtual = 1;
+            conhecimento = 10;
+            oportunidades = 50;
+            faltas = 0;
+            
+            actionButtons.style.display = 'flex';
+            btnReiniciar.style.display = 'none';
+            mensagem.innerHTML = "Novo semestre começou! Prove que você pode ser a melhor versão de si mesmo.";
+            mensagem.style.background = "#e1f5fe";
+            mensagem.style.color = "inherit";
+            
+            atualizarUI();
+        }
+    </script>
+</body>
+</html>
